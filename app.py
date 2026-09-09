@@ -136,7 +136,7 @@ st.markdown(
 def load_model():
 
     return joblib.load(
-        "models/bank_marketing_final_model.joblib"
+        "models/bank_marketing_threshold.joblib"
     )
 
 
