@@ -1,18 +1,7 @@
-
 import streamlit as st
 import pandas as pd
 import joblib
-
-@st.cache_resource
-def load_model():
-    model = joblib.load(
-        "models/bank_marketing_threshold.joblib"
-    )
-    return model
-
-model = load_model()
-
-THRESHOLD = 0.44
+from huggingface_hub import hf_hub_download
 
 
 # ============================================================
@@ -135,9 +124,12 @@ st.markdown(
 @st.cache_resource
 def load_model():
 
-    return joblib.load(
-        "models/bank_marketing_threshold.joblib"
+    model_path = hf_hub_download(
+        repo_id="AbdelrahmanAkl/bank-marketing-subscription-model",
+        filename="bank_marketing_final_model.joblib"
     )
+
+    return joblib.load(model_path)
 
 
 try:
@@ -153,7 +145,6 @@ except Exception as e:
     st.exception(e)
 
     st.stop()
-
 
 # ============================================================
 # MODEL CONFIGURATION
