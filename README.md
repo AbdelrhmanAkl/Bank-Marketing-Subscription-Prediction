@@ -1,403 +1,336 @@
-# 🏦 Bank Marketing Subscription Prediction
+# Bank Marketing Subscription Prediction
 
-An end-to-end **Machine Learning classification project** that predicts whether a bank customer is likely to subscribe to a term deposit.
+A machine learning system that estimates how likely a bank customer is to subscribe to a term deposit, so marketing teams can focus calls on the customers most worth contacting.
 
-The project focuses on **imbalanced classification**, model benchmarking, hyperparameter optimization, decision-threshold tuning, explainability, and customer-level prediction.
+The project covers the full workflow: exploratory analysis, imbalanced-classification modeling, hyperparameter tuning, decision-threshold optimization, explainability, error analysis, and deployment as an interactive web application.
 
----
-
-## 🚀 Live Demo
-
-### 🌐 Try the Interactive Application
-
-👉 **[Launch the Streamlit App](https://bank-marketing-subscription-prediction-yu3uarppazgwrybswiuxkq.streamlit.app/)**
-
-The deployed application allows users to enter customer information and receive a real-time prediction of whether the customer is likely to subscribe to a term deposit.
-
-**Deployment Stack:**
-
-* Streamlit Community Cloud
-* Hugging Face Hub
-* Scikit-learn
-* Python
+**Live application:** https://bank-marketing-subscription-prediction-yu3uarppazgwrybswiuxkq.streamlit.app/
+**Trained model:** https://huggingface.co/AbdelrahmanAkl/bank-marketing-subscription-model
 
 ---
 
-## 🤗 Trained Model
+## Table of Contents
 
-The trained **Tuned Random Forest** model is hosted separately on Hugging Face and downloaded dynamically by the Streamlit application.
-
-👉 **[View the Model on Hugging Face](https://huggingface.co/AbdelrahmanAkl/bank-marketing-subscription-model)**
-
-**Model:** Tuned Random Forest
-**Decision Threshold:** `0.44`
-**Model Format:** `.joblib`
-
-Hosting the model separately keeps the GitHub repository lightweight while allowing the deployed application to load the trained model at runtime.
-
----
-
-## 📌 Project Overview
-
-Bank marketing campaigns typically contact a large number of customers, while only a relatively small percentage eventually subscribe to the offered term deposit.
-
-The objective of this project is to build a classification system that identifies customers with a higher probability of subscription.
-
-This can help marketing teams:
-
-* Prioritize high-potential customers
-* Improve campaign efficiency
-* Reduce unnecessary customer contacts
-* Better balance marketing effort and conversion potential
-
-Because the target variable is highly imbalanced, **accuracy alone is not sufficient** for evaluating model performance.
-
-Therefore, the project emphasizes:
-
-* **F1-score**
-* **Precision**
-* **Recall**
-* **ROC-AUC**
+1. [Business Problem](#business-problem)
+2. [Application](#application)
+3. [Dataset](#dataset)
+4. [Methodology](#methodology)
+5. [Results](#results)
+6. [Explainability and Error Analysis](#explainability-and-error-analysis)
+7. [Architecture](#architecture)
+8. [Project Structure](#project-structure)
+9. [Getting Started](#getting-started)
+10. [Configuration](#configuration)
+11. [Limitations](#limitations)
+12. [Technology Stack](#technology-stack)
+13. [Author](#author)
 
 ---
 
-## 📊 Dataset
+## Business Problem
 
-The project uses the **Bank Marketing dataset**, containing:
+Term deposit campaigns contact a large number of customers, and only a small share of them subscribe. Contacting everyone wastes agent time and annoys customers who will never convert.
 
-* **45,211 customers**
-* **16 input features**
-* **1 binary target variable**
-* Numerical and categorical features
+This project ranks customers by their probability of subscribing. The marketing team can then:
 
-### Target Distribution
+- Prioritize high-potential customers
+- Reduce unnecessary contacts
+- Balance outreach cost against expected conversions
+- Adjust campaign aggressiveness by changing a single decision threshold
 
-| Class           |  Count | Percentage |
-| --------------- | -----: | ---------: |
-| No Subscription | 39,922 |      88.3% |
-| Subscription    |  5,289 |      11.7% |
-
-The strong class imbalance makes a naive accuracy-based approach potentially misleading.
+Because only about 12% of customers subscribe, accuracy is a misleading metric. A model that always predicts "no" would be 88% accurate and useless. Evaluation therefore centers on F1-score, precision, recall, and ROC-AUC.
 
 ---
 
-## 🔄 Machine Learning Pipeline
+## Application
 
-The project follows a complete end-to-end ML workflow:
+The Streamlit application provides three views.
 
-1. Exploratory Data Analysis
+**Single customer.** Enter a customer profile and receive the subscription probability, a lead tier (Hot lead, Qualified lead, Nurture, Low priority), and a recommended next step. Example profiles can be loaded to demonstrate the tool quickly.
+
+**Batch scoring.** Upload a CSV file of customers. The application scores every row, ranks customers from most to least likely to subscribe, summarizes the results, and offers the ranked list as a CSV download. A template file with the expected columns can be downloaded from the page.
+
+**About the model.** A short explanation of how the model works and its held-out test performance.
+
+The decision threshold can be changed from the sidebar. A lower threshold reaches more potential subscribers at the cost of more wasted contacts; a higher threshold concentrates effort on the most certain leads.
+
+Branding (product name, tagline, support email) is configured by constants at the top of `app.py`.
+
+---
+
+## Dataset
+
+The project uses the Bank Marketing dataset (`bank-full.csv`).
+
+| Property | Value |
+| --- | --- |
+| Customers | 45,211 |
+| Input features | 16 |
+| Target | Binary: subscribed to a term deposit or not |
+| Feature types | Numerical and categorical |
+
+### Target distribution
+
+| Class | Count | Share |
+| --- | ---: | ---: |
+| No subscription | 39,922 | 88.3% |
+| Subscription | 5,289 | 11.7% |
+
+### Input features
+
+| Group | Features |
+| --- | --- |
+| Personal | age, job, marital, education |
+| Financial | default, balance, housing, loan |
+| Last contact | contact, day, month, duration |
+| Campaign history | campaign, pdays, previous, poutcome |
+
+---
+
+## Methodology
+
+### Workflow
+
+1. Exploratory data analysis
 2. Data quality analysis
-3. Stratified train/validation/test split
-4. Numerical feature preprocessing
-5. Categorical feature preprocessing
-6. Baseline modeling
-7. Model benchmarking
-8. Hyperparameter tuning
-9. Stratified cross-validation
-10. Decision-threshold optimization
-11. Final model selection
-12. SHAP explainability
-13. Error analysis
-14. Model persistence
-15. Customer-level prediction
-16. Streamlit deployment
+3. Stratified train, validation, and test split
+4. Preprocessing of numerical and categorical features
+5. Baseline modeling
+6. Model benchmarking
+7. Hyperparameter tuning
+8. Stratified cross-validation
+9. Decision-threshold optimization
+10. Final model selection
+11. Explainability with SHAP
+12. Error analysis
+13. Model persistence
+14. Deployment
+
+### Preprocessing
+
+| Feature type | Steps |
+| --- | --- |
+| Numerical | Median imputation, standard scaling |
+| Categorical | Most-frequent imputation, one-hot encoding with unknown-category handling |
+
+Preprocessing and the classifier are combined in a single scikit-learn `Pipeline`, so the same transformations are applied during training and inference. After encoding, the feature matrix has 50 columns.
+
+### Models evaluated
+
+- Logistic Regression
+- Class-weighted Logistic Regression
+- Random Forest
+- Tuned Random Forest
+- HistGradientBoosting
+- XGBoost
+
+Stratified 5-fold cross-validation was used where applicable.
+
+### Hyperparameter tuning
+
+`RandomizedSearchCV` with stratified 5-fold cross-validation was used to tune the Random Forest.
+
+| Parameter | Value |
+| --- | --- |
+| class_weight | balanced_subsample |
+| max_depth | None |
+| max_features | 0.7 |
+| min_samples_leaf | 7 |
+| min_samples_split | 10 |
+| n_estimators | 527 |
+
+Best cross-validation F1: 0.4693
 
 ---
 
-## ⚙️ Preprocessing
+## Results
 
-### Numerical Features
+### Model comparison (validation set)
 
-* Median imputation
-* StandardScaler
+| Model | F1 | ROC-AUC | CV mean F1 |
+| --- | ---: | ---: | ---: |
+| **Tuned Random Forest** | **0.4918** | 0.7965 | **0.4693** |
+| HistGradientBoosting | 0.3367 | 0.8054 | 0.3325 |
+| XGBoost | 0.3327 | **0.8077** | 0.3317 |
+| Random Forest | 0.3233 | 0.7966 | 0.3000 |
+| Logistic Regression | 0.2843 | 0.7699 | not computed |
 
-### Categorical Features
+The Tuned Random Forest was selected because it has the strongest F1-score and cross-validated F1. XGBoost reaches a slightly higher ROC-AUC, but its F1 is far lower, and the project objective is to balance precision and recall on the minority class.
 
-* Most-frequent imputation
-* One-hot encoding
-* Unknown-category handling
+### Decision threshold
 
-The preprocessing steps and classifier are combined into a single **Scikit-learn Pipeline**, ensuring that the same transformations are consistently applied during training and inference.
+The default threshold of 0.50 was replaced by a value tuned on the validation set.
 
-After preprocessing, the feature matrix contains **50 features**.
+| Setting | Threshold |
+| --- | ---: |
+| Default | 0.50 |
+| Selected | **0.44** |
 
----
+Validation performance at the selected threshold:
 
-## 🤖 Models Evaluated
+| Metric | Score |
+| --- | ---: |
+| Accuracy | 86.52% |
+| Precision | 44.09% |
+| Recall | 56.42% |
+| F1-score | 49.50% |
+| ROC-AUC | 79.65% |
 
-Several classification algorithms were evaluated:
+### Final model on the held-out test set
 
-* Logistic Regression
-* Class-Weighted Logistic Regression
-* Random Forest
-* Tuned Random Forest
-* HistGradientBoosting
-* XGBoost
+| Metric | Score |
+| --- | ---: |
+| F1-score | 47.86% |
+| ROC-AUC | 78.32% |
 
-Stratified 5-Fold Cross-Validation was used where applicable to obtain a more robust estimate of model performance.
-
----
-
-## 📈 Model Comparison
-
-| Model                   | Validation F1 |    ROC-AUC | CV Mean F1 |
-| ----------------------- | ------------: | ---------: | ---------: |
-| **Tuned Random Forest** |    **0.4918** |     0.7965 | **0.4693** |
-| HistGradientBoosting    |        0.3367 |     0.8054 |     0.3325 |
-| XGBoost                 |        0.3327 | **0.8077** |     0.3317 |
-| Random Forest           |        0.3233 |     0.7966 |     0.3000 |
-| Logistic Regression     |        0.2843 |     0.7699 |          — |
-
-### 🏆 Model Selection
-
-The **Tuned Random Forest** was selected as the final model because it achieved the strongest **F1-score** and **cross-validation F1 performance** among the evaluated models.
-
-Although XGBoost achieved the highest ROC-AUC, the Tuned Random Forest provided a substantially stronger F1-score, making it more suitable for the project's primary objective of balancing Precision and Recall for the minority class.
+The small drop from validation to test performance is expected and indicates the model generalizes without large overfitting.
 
 ---
 
-## 🎯 Hyperparameter Tuning
+## Explainability and Error Analysis
 
-`RandomizedSearchCV` with **Stratified 5-Fold Cross-Validation** was used to optimize the Random Forest.
+SHAP (SHapley Additive exPlanations) was used to identify which features drive predictions and in which direction. This makes the model's behavior easier to audit and to explain to business stakeholders.
 
-### Best Parameters
+Error analysis examined three groups of cases: customers incorrectly predicted to subscribe, potential subscribers the model missed, and predictions with uncertain probabilities. The findings guide where future feature engineering and data collection are most likely to help.
+
+---
+
+## Architecture
 
 ```text
-class_weight       = balanced_subsample
-max_depth          = None
-max_features       = 0.7
-min_samples_leaf   = 7
-min_samples_split  = 10
-n_estimators       = 527
+User input (form or CSV upload)
+        |
+        v
+Streamlit application
+        |
+        v
+Hugging Face Hub  --->  trained model (.joblib), cached after first load
+        |
+        v
+scikit-learn Pipeline (preprocessing + Random Forest)
+        |
+        v
+Subscription probability  --->  compared with the decision threshold
+        |
+        v
+Decision, lead tier, and recommended next step
 ```
 
-### Best Cross-Validation F1
-
-```text
-0.4693
-```
-
-### Tuned Random Forest Performance
-
-| Metric       |      Score |
-| ------------ | ---------: |
-| Accuracy     |     87.69% |
-| Precision    |     47.59% |
-| Recall       |     50.88% |
-| **F1 Score** | **49.18%** |
-| ROC-AUC      |     79.65% |
+The trained model is about 110 MB. It is hosted on Hugging Face instead of GitHub, which keeps the repository small, and the application downloads it once at startup.
 
 ---
 
-## 🎚️ Decision Threshold Optimization
-
-The default classification threshold of `0.50` was optimized using the validation set to improve the balance between Precision and Recall.
-
-The selected threshold for the final Random Forest model was:
-
-```text
-0.44
-```
-
-### Validation Performance
-
-| Metric       |      Score |
-| ------------ | ---------: |
-| Accuracy     |     86.52% |
-| Precision    |     44.09% |
-| Recall       |     56.42% |
-| **F1-score** | **49.50%** |
-| ROC-AUC      |     79.65% |
-
-Lowering the decision threshold from `0.50` to `0.44` increased the model's sensitivity to potential subscribers and improved the balance between Precision and Recall.
-
----
-
-## 🧠 Final Model
-
-The final production model is a **Tuned Random Forest** combined with the complete preprocessing pipeline.
-
-```text
-Model              : Tuned Random Forest
-Decision Threshold : 0.44
-Features           : 50
-Model Format       : Joblib
-```
-
-The trained model is persisted and hosted on Hugging Face for use by the deployed Streamlit application.
-
----
-
-## 🔍 Explainability
-
-**SHAP (SHapley Additive exPlanations)** was used to analyze model behavior and understand which features contribute most strongly to predictions.
-
-This provides greater interpretability and helps identify the factors influencing customer subscription predictions.
-
----
-
-## 🧪 Error Analysis
-
-The project also includes prediction error analysis to investigate cases where the model:
-
-* Predicts subscription incorrectly
-* Misses potential subscribers
-* Produces uncertain probability estimates
-
-This analysis helps identify areas where model performance can potentially be improved.
-
----
-
-## 🌐 Deployment Architecture
-
-The deployed application follows this architecture:
-
-```text
-                    ┌─────────────────────┐
-                    │      User Input      │
-                    └──────────┬──────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │ Streamlit Web App   │
-                    └──────────┬──────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │ Hugging Face Hub    │
-                    │   Trained Model     │
-                    └──────────┬──────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │ Scikit-learn        │
-                    │ Preprocessing + RF  │
-                    └──────────┬──────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │ Probability +       │
-                    │ Threshold 0.44      │
-                    └──────────┬──────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │ Subscription        │
-                    │ Prediction          │
-                    └─────────────────────┘
-```
-
----
-
-## 🛠️ Technology Stack
-
-| Category          | Technologies        |
-| ----------------- | ------------------- |
-| Programming       | Python              |
-| Data Processing   | Pandas, NumPy       |
-| Machine Learning  | Scikit-learn        |
-| Gradient Boosting | XGBoost, LightGBM   |
-| Explainability    | SHAP                |
-| Visualization     | Matplotlib, Seaborn |
-| Model Persistence | Joblib              |
-| Web Application   | Streamlit           |
-| Model Hosting     | Hugging Face Hub    |
-| Version Control   | Git & GitHub        |
-
----
-
-## 📂 Project Structure
+## Project Structure
 
 ```text
 Bank-Marketing-Subscription-Prediction/
-│
-├── app.py
-├── README.md
-├── requirements.txt
-│
-├── data/
-│   └── bank-full.csv
-│
-├── models/
-│   └── bank_marketing_threshold.joblib
-│
-└── notebooks/
-    └── Bank_Marketing_Subscription_Prediction.ipynb
+|-- app.py
+|-- README.md
+|-- requirements.txt
+|-- .streamlit/
+|   `-- config.toml
+|-- data/
+|   `-- bank-full.csv
+|-- models/
+|   `-- bank_marketing_threshold.joblib
+`-- notebooks/
+    `-- Bank_Marketing_Subscription_Prediction.ipynb
 ```
-
-> The trained 110 MB model is hosted externally on Hugging Face rather than stored directly in the GitHub repository.
 
 ---
 
-## 🚀 Running the Project Locally
+## Getting Started
 
-### 1. Clone the repository
+### Prerequisites
+
+- Python 3.10 or later
+- Internet access on first run, to download the model
+
+### Installation
 
 ```bash
 git clone https://github.com/AbdelrhmanAkl/Bank-Marketing-Subscription-Prediction.git
 cd Bank-Marketing-Subscription-Prediction
-```
 
-### 2. Create a virtual environment
-
-```bash
 python -m venv .venv
 ```
 
-### 3. Activate the environment
+Activate the environment.
 
-**Windows PowerShell:**
+Windows PowerShell:
 
 ```powershell
 .venv\Scripts\Activate.ps1
 ```
 
-### 4. Install dependencies
+macOS and Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+Install dependencies and run the application:
 
 ```bash
 pip install -r requirements.txt
-```
-
-### 5. Run the application
-
-```bash
 python -m streamlit run app.py
 ```
 
-The application will automatically download the trained model from Hugging Face when required.
+### Batch file format
+
+The uploaded CSV must contain these 16 columns, with the same category values used in training (for example, `job` values such as `admin.` or `blue-collar`, and lowercase three-letter month names):
+
+```text
+age, job, marital, education, default, balance, housing, loan,
+contact, day, month, duration, campaign, pdays, previous, poutcome
+```
+
+A ready-made template is available inside the application.
 
 ---
 
-## 📚 Project Goals
+## Configuration
 
-This project demonstrates practical experience with:
-
-* End-to-end Machine Learning workflows
-* Imbalanced binary classification
-* Feature preprocessing
-* Ensemble learning
-* Hyperparameter optimization
-* Cross-validation
-* Decision-threshold optimization
-* Model explainability
-* Error analysis
-* Model persistence
-* ML deployment
-* External model hosting
-* Interactive prediction applications
+| Setting | Location | Purpose |
+| --- | --- | --- |
+| `BRAND_NAME`, `BRAND_TAGLINE`, `SUPPORT_EMAIL` | top of `app.py` | White-label the interface |
+| `MODEL_REPO`, `MODEL_FILE` | top of `app.py` | Point to a different hosted model |
+| `DEFAULT_THRESHOLD` | top of `app.py` | Initial decision threshold |
+| Theme colors | `.streamlit/config.toml` | Streamlit accent and background colors |
 
 ---
 
-## 👨‍💻 Author
+## Limitations
+
+- **Call duration is only known after the call.** The `duration` feature strongly predicts the outcome but is not available before a customer is contacted. The model is therefore best used to rank customers who have already had contact, or as a basis for retraining a pre-call variant that excludes this feature.
+- **Moderate precision.** At the selected threshold, roughly half of the customers flagged as likely subscribers will not subscribe. The model supports prioritization and should not be the only basis for a decision about a customer.
+- **Single-market data.** The dataset comes from one bank's historical campaigns. Performance on a different market, period, or product should be validated before relying on it.
+- **Static model.** Customer behavior drifts over time. The model should be monitored and retrained periodically on recent campaign data.
+
+---
+
+## Technology Stack
+
+| Category | Tools |
+| --- | --- |
+| Language | Python |
+| Data processing | Pandas, NumPy |
+| Machine learning | scikit-learn, XGBoost, LightGBM |
+| Explainability | SHAP |
+| Visualization | Matplotlib, Seaborn |
+| Model persistence | Joblib |
+| Model hosting | Hugging Face Hub |
+| Web application | Streamlit |
+| Deployment | Streamlit Community Cloud |
+| Version control | Git and GitHub |
+
+---
+
+## Author
 
 **Abdelrahman Ahmed Akl**
+AI and Machine Learning Engineer, focused on NLP, LLMs, and AI agents.
 
-AI / Machine Learning Engineer | NLP | LLMs | AI Agents
-
----
-
-## 🔗 Project Links
-
-* 🚀 **Live Demo:** https://bank-marketing-subscription-prediction-yu3uarppazgwrybswiuxkq.streamlit.app/
-* 💻 **GitHub Repository:** https://github.com/AbdelrhmanAkl/Bank-Marketing-Subscription-Prediction
-* 🤗 **Hugging Face Model:** https://huggingface.co/AbdelrahmanAkl/bank-marketing-subscription-model
+- GitHub: https://github.com/AbdelrhmanAkl/Bank-Marketing-Subscription-Prediction
+- Hugging Face: https://huggingface.co/AbdelrahmanAkl/bank-marketing-subscription-model
+- Live application: https://bank-marketing-subscription-prediction-yu3uarppazgwrybswiuxkq.streamlit.app/
