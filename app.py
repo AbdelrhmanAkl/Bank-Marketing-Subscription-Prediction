@@ -173,21 +173,18 @@ def tier_for(p: float, t: float):
 
 
 def gauge_svg(p: float, t: float) -> str:
+    """Horizontal probability bar with a labelled threshold marker."""
     p = max(0.0, min(1.0, p))
-    ang = math.pi * (1 - t)
-    x1, y1 = 100 + 70 * math.cos(ang), 100 - 70 * math.sin(ang)
-    x2, y2 = 100 + 96 * math.cos(ang), 100 - 96 * math.sin(ang)
     parts = [
-        '<svg viewBox="0 0 200 124" width="100%" style="max-width:340px;display:block;margin:6px auto 0">',
-        '<defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="0">'
-        '<stop offset="0" stop-color="#0b6b4f"/><stop offset="1" stop-color="#d4a73a"/></linearGradient></defs>',
-        '<path d="M12 100 A88 88 0 0 1 188 100" fill="none" stroke="#e3e9e5" stroke-width="14" stroke-linecap="round" pathLength="100"/>',
-        f'<path d="M12 100 A88 88 0 0 1 188 100" fill="none" stroke="url(#gg)" stroke-width="14" stroke-linecap="round" pathLength="100" stroke-dasharray="{max(p*100, 0.5):.2f} 100"/>',
-        f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="#06241b" stroke-width="2.5"/>',
-        f'<text x="100" y="94" font-size="20" font-weight="600" fill="#06241b" text-anchor="middle">{p:.0%}</text>',
-        '<text x="12" y="118" font-size="9" fill="#5b6b63">0%</text>',
-        '<text x="188" y="118" font-size="9" fill="#5b6b63" text-anchor="end">100%</text>',
-        '</svg>',
+        '<div style="position:relative;margin:26px 0 38px 0">',
+        '<div style="height:16px;border-radius:8px;background:#e3e9e5;overflow:hidden">',
+        f'<div style="width:{max(p*100, 1):.1f}%;height:100%;border-radius:8px;'
+        'background:linear-gradient(90deg,#0b6b4f,#d4a73a)"></div></div>',
+        f'<div style="position:absolute;left:{t*100:.1f}%;top:-6px;width:3px;height:28px;'
+        'background:#06241b;border-radius:2px;transform:translateX(-50%)"></div>',
+        f'<div style="position:absolute;left:{t*100:.1f}%;top:28px;transform:translateX(-50%);'
+        f'font-size:12px;font-weight:600;color:#06241b;white-space:nowrap">Threshold {t:.0%}</div>',
+        '</div>',
     ]
     return "".join(parts)
 
