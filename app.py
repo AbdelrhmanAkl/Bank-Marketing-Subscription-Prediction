@@ -58,9 +58,10 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:wght@500;600&display=swap');
 
 :root{
-  --ink:#10212f; --muted:#5d6b78; --line:#dde3e9; --paper:#f4f6f8; --card:#ffffff;
-  --teal:#0f766e; --teal-soft:#e3f4f1; --amber:#b7791f; --amber-soft:#fbf1dc;
-  --red:#b4443c; --red-soft:#f9e5e3; --blue:#2c5a85; --blue-soft:#e4edf6;
+  --ink:#06241b; --muted:#5b6b63; --line:#d9e1db; --paper:#eef2ee; --card:#ffffff;
+  --teal:#0b6b4f; --teal-soft:#dff2e8; --gold:#d4a73a; --gold-deep:#a97f16; --gold-soft:#f8edc9;
+  --amber:#a97f16; --amber-soft:#f8edc9; --red:#b4443c; --red-soft:#f9e5e3;
+  --blue:#2f5d50; --blue-soft:#e6efe9;
 }
 html, body, [class*="css"], .stApp { font-family:'IBM Plex Sans', sans-serif; color:var(--ink); }
 .stApp { background:var(--paper); }
@@ -70,19 +71,19 @@ html, body, [class*="css"], .stApp { font-family:'IBM Plex Sans', sans-serif; co
 h1,h2,h3,h4 { font-family:'IBM Plex Sans', sans-serif; letter-spacing:-0.01em; color:var(--ink); }
 
 /* Sidebar */
-[data-testid="stSidebar"] { background:var(--ink); }
+[data-testid="stSidebar"] { background:linear-gradient(180deg,#04251c 0%,#0a3d2e 100%); border-right:3px solid var(--gold); }
 [data-testid="stSidebar"] * { color:#e8eef3; }
 [data-testid="stSidebar"] hr { border-color:rgba(255,255,255,.14); }
-.brand { font-family:'Newsreader', serif; font-size:30px; font-weight:600; margin-bottom:2px; }
+.brand { font-family:'Newsreader', serif; font-size:34px; font-weight:600; margin-bottom:2px; color:var(--gold) !important; }
 .brand-sub { font-size:13px; color:#9fb2c1 !important; margin-bottom:6px; }
 .side-label { font-size:12px; color:#9fb2c1 !important; margin-bottom:2px; }
-.side-value { font-size:15px; font-weight:500; margin-bottom:12px; }
+.side-value { font-size:16px; font-weight:600; margin-bottom:12px; color:#f0d58a !important; }
 
 /* Header */
-.hero { background:var(--card); border:1px solid var(--line); border-radius:10px;
-        padding:26px 30px; margin-bottom:18px; }
-.hero h1 { font-family:'Newsreader', serif; font-size:38px; font-weight:600; margin:0 0 6px 0; }
-.hero p { color:var(--muted); font-size:16px; margin:0; max-width:720px; line-height:1.55; }
+.hero { background:linear-gradient(120deg,#04251c 0%,#0b5a43 100%); border:1px solid #0b5a43;
+        border-bottom:4px solid var(--gold); border-radius:12px; padding:30px 34px; margin-bottom:18px; }
+.hero h1 { font-family:'Newsreader', serif; font-size:40px; font-weight:600; margin:0 0 8px 0; color:#fff; }
+.hero p { color:#cfe3d8; font-size:16px; margin:0; max-width:720px; line-height:1.55; }
 
 /* Panels */
 .panel-title { font-size:15px; font-weight:600; margin:2px 0 10px 0; }
@@ -95,29 +96,40 @@ div[data-testid="stForm"] { background:var(--card); border:1px solid var(--line)
 .stButton > button, .stDownloadButton > button, div[data-testid="stFormSubmitButton"] > button {
   border-radius:8px; font-weight:600; height:46px; }
 div[data-testid="stFormSubmitButton"] > button[kind="primaryFormSubmit"],
-.stButton > button[kind="primary"] { background:var(--teal); border:1px solid var(--teal); color:#fff; }
+.stButton > button[kind="primary"] { background:linear-gradient(90deg,#b98a1c,#e3b94d); border:1px solid #a97f16; color:#06241b; }
 div[data-testid="stFormSubmitButton"] > button[kind="primaryFormSubmit"]:hover,
-.stButton > button[kind="primary"]:hover { background:#0b5f59; border-color:#0b5f59; }
+.stButton > button[kind="primary"]:hover { background:linear-gradient(90deg,#a97f16,#d4a73a); border-color:#8c6910; color:#06241b; }
+
+/* Brand overrides for Streamlit red accents */
+.stTabs [data-baseweb="tab"][aria-selected="true"] { color:var(--teal); }
+.stTabs [data-baseweb="tab-highlight"] { background-color:var(--gold) !important; height:3px; }
+.stTabs [data-baseweb="tab"]:hover { color:var(--gold-deep); }
+[data-baseweb="slider"] div[role="slider"] { background-color:var(--gold) !important; box-shadow:none !important; }
+[data-baseweb="slider"] > div > div > div { background:linear-gradient(90deg,#0b6b4f,#d4a73a) !important; }
+[data-testid="stSidebar"] [data-testid="stSliderThumbValue"] { color:var(--gold) !important; }
+a { color:var(--gold-deep) !important; }
+[data-testid="stSidebar"] a { color:var(--gold) !important; }
 
 /* Result */
-.result { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:24px 28px; }
+.result { background:var(--card); border:1px solid var(--line); border-top:4px solid var(--gold); border-radius:10px; padding:24px 28px; }
 .badge { display:inline-block; padding:5px 12px; border-radius:6px; font-size:13px; font-weight:600; }
 .b-high { background:var(--teal-soft); color:var(--teal); }
 .b-mid  { background:var(--blue-soft); color:var(--blue); }
 .b-nurt { background:var(--amber-soft); color:var(--amber); }
 .b-low  { background:var(--red-soft); color:var(--red); }
-.prob { font-family:'Newsreader', serif; font-size:64px; font-weight:600; line-height:1; margin:10px 0 4px 0; }
+.prob { font-family:'Newsreader', serif; font-size:68px; font-weight:600; color:var(--teal); line-height:1; margin:10px 0 4px 0; }
 .small-muted { color:var(--muted); font-size:14px; line-height:1.5; }
 .kv { display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--line); font-size:14px; }
 .kv:last-child { border-bottom:none; }
 .kv span:first-child { color:var(--muted); }
-.action { border-left:3px solid var(--teal); background:var(--paper); padding:12px 16px;
+.action { border-left:4px solid var(--gold); background:var(--gold-soft); padding:12px 16px;
           border-radius:0 8px 8px 0; margin-top:14px; font-size:15px; line-height:1.5; }
 
 /* KPI */
 .kpi { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px 18px; }
 .kpi .l { color:var(--muted); font-size:13px; }
-.kpi .v { font-size:28px; font-weight:600; margin-top:4px; }
+.kpi .v { font-size:28px; font-weight:600; margin-top:4px; color:var(--teal); }
+.kpi { border-top:3px solid var(--gold); }
 
 .legal { color:#8794a0; font-size:12.5px; text-align:center; margin-top:34px; line-height:1.6; }
 @media (max-width:700px){ .hero h1{font-size:28px;} .prob{font-size:50px;} }
@@ -163,18 +175,21 @@ def tier_for(p: float, t: float):
 def gauge_svg(p: float, t: float) -> str:
     p = max(0.0, min(1.0, p))
     ang = math.pi * (1 - t)
-    x1, y1 = 100 + 68 * math.cos(ang), 100 - 68 * math.sin(ang)
-    x2, y2 = 100 + 92 * math.cos(ang), 100 - 92 * math.sin(ang)
-    return f"""
-    <svg viewBox="0 0 200 118" width="100%" style="max-width:340px">
-      <path d="M12 100 A88 88 0 0 1 188 100" fill="none" stroke="#e6ebf0" stroke-width="14"
-            stroke-linecap="round" pathLength="100"/>
-      <path d="M12 100 A88 88 0 0 1 188 100" fill="none" stroke="#0f766e" stroke-width="14"
-            stroke-linecap="round" pathLength="100" stroke-dasharray="{p*100:.2f} 100"/>
-      <line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="#10212f" stroke-width="2.5"/>
-      <text x="12" y="116" font-size="9" fill="#5d6b78">0%</text>
-      <text x="188" y="116" font-size="9" fill="#5d6b78" text-anchor="end">100%</text>
-    </svg>"""
+    x1, y1 = 100 + 70 * math.cos(ang), 100 - 70 * math.sin(ang)
+    x2, y2 = 100 + 96 * math.cos(ang), 100 - 96 * math.sin(ang)
+    parts = [
+        '<svg viewBox="0 0 200 124" width="100%" style="max-width:340px;display:block;margin:6px auto 0">',
+        '<defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="0">'
+        '<stop offset="0" stop-color="#0b6b4f"/><stop offset="1" stop-color="#d4a73a"/></linearGradient></defs>',
+        '<path d="M12 100 A88 88 0 0 1 188 100" fill="none" stroke="#e3e9e5" stroke-width="14" stroke-linecap="round" pathLength="100"/>',
+        f'<path d="M12 100 A88 88 0 0 1 188 100" fill="none" stroke="url(#gg)" stroke-width="14" stroke-linecap="round" pathLength="100" stroke-dasharray="{max(p*100, 0.5):.2f} 100"/>',
+        f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="#06241b" stroke-width="2.5"/>',
+        f'<text x="100" y="94" font-size="20" font-weight="600" fill="#06241b" text-anchor="middle">{p:.0%}</text>',
+        '<text x="12" y="118" font-size="9" fill="#5b6b63">0%</text>',
+        '<text x="188" y="118" font-size="9" fill="#5b6b63" text-anchor="end">100%</text>',
+        '</svg>',
+    ]
+    return "".join(parts)
 
 
 def apply_preset():
@@ -292,21 +307,21 @@ with tab_single:
               <p class="small-muted">Fill in the customer profile and select
               <b>Score this customer</b>. The probability, lead tier and recommended next step
               will appear here.</p>
-            </div>""", unsafe_allow_html=True)
+</div>""", unsafe_allow_html=True)
         else:
             label, css, action = tier_for(p, threshold)
             verdict = "Likely to subscribe" if p >= threshold else "Unlikely to subscribe"
             st.markdown(f"""
-            <div class="result">
-              <span class="badge {css}">{label}</span>
-              <div class="prob">{p:.1%}</div>
-              <div class="small-muted">Probability of subscribing to a term deposit</div>
-              {gauge_svg(p, threshold)}
-              <div class="kv"><span>Decision</span><span><b>{verdict}</b></span></div>
-              <div class="kv"><span>Threshold</span><span>{threshold:.0%}</span></div>
-              <div class="kv"><span>Distance from threshold</span><span>{(p - threshold)*100:+.1f} pts</span></div>
-              <div class="action"><b>Next step:</b> {action}</div>
-            </div>""", unsafe_allow_html=True)
+<div class="result">
+<span class="badge {css}">{label}</span>
+<div class="prob">{p:.1%}</div>
+<div class="small-muted">Probability of subscribing to a term deposit</div>
+{gauge_svg(p, threshold)}
+<div class="kv"><span>Decision</span><span><b>{verdict}</b></span></div>
+<div class="kv"><span>Threshold</span><span>{threshold:.0%}</span></div>
+<div class="kv"><span>Distance from threshold</span><span>{(p - threshold)*100:+.1f} pts</span></div>
+<div class="action"><b>Next step:</b> {action}</div>
+</div>""", unsafe_allow_html=True)
 
 # ============================================================
 # TAB 2: BATCH
