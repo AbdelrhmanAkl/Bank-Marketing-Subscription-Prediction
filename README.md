@@ -5,6 +5,7 @@ A machine learning system that estimates how likely a bank customer is to subscr
 The project covers the full workflow: exploratory analysis, imbalanced-classification modeling, hyperparameter tuning, decision-threshold optimization, explainability, error analysis, and deployment as an interactive web application.
 
 **Live application:** https://bank-marketing-subscription-prediction-yu3uarppazgwrybswiuxkq.streamlit.app/
+
 **Trained model:** https://huggingface.co/AbdelrahmanAkl/bank-marketing-subscription-model
 
 ---
